@@ -27,14 +27,10 @@ public class FilmController {
     public Film put(@Valid @RequestBody Film film) {
         filmValidate(film);
         if (!films.containsKey(film.getId())) {
-            for (Film anotherFilm : films.values()) {
-                if (anotherFilm.equals(film)) {
-                    throw new AlreadyExistException("Такой фильм уже есть в списке с другим id!");
-                }
-            }
+            throw new NullPointerException("Ошибка обновления фильма: id " + film.getId() + " нет в базе!");
         }
         films.put(film.getId(), film);
-        log.info("Добавление/обновление фильма");
+        log.info("Обновление фильма");
         return film;
     }
 

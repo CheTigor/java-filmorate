@@ -23,12 +23,9 @@ public class UserController {
 
     @PutMapping
     public User put(@Valid @RequestBody User user) {
-        if (!users.containsKey(user.getId()))
-            for (User anotherUser : users.values()) {
-                if (anotherUser.equals(user)) {
-                    throw new AlreadyExistException("Такой пользователь уже есть в списке с другим id!");
-                }
-            }
+        if (!users.containsKey(user.getId())) {
+            throw new NullPointerException("Ошибка обновления пользователя: id " + user.getId() + " нет в базе!");
+        }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
