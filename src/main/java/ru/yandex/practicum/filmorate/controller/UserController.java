@@ -23,19 +23,22 @@ public class UserController {
 
     @PutMapping
     public User put(@Valid @RequestBody User user) {
+        log.debug("Получен запрос PUT user, user: {}", user);
         if (!users.containsKey(user.getId())) {
             throw new NullPointerException("Ошибка обновления пользователя: id " + user.getId() + " нет в базе!");
         }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
+            log.debug("Имя подставляется в логин, name = {}", user.getName());
         }
         users.put(user.getId(), user);
-        log.info("Добавление/обновление пользователя: {}", user.getEmail());
+        log.debug("Получен ответ PUT user, user: {}", user);
         return user;
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
+        log.debug("Получен запрос POST user, user: {}", user);
         for (User anotherUser : users.values()) {
             if (anotherUser.equals(user)) {
                 throw new AlreadyExistException("Такой пользователь уже есть в списке!");
@@ -43,10 +46,12 @@ public class UserController {
         }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
+            log.debug("Имя подставляется в логин, name = {}", user.getName());
         }
         user.setId(id++);
+        log.debug("Присвоение user id: {}", user.getId());
         users.put(user.getId(), user);
-        log.info("Создание нового пользователя: {}", user.getEmail());
+        log.debug("Получен ответ POST user, user: {}", user);
         return user;
     }
 }

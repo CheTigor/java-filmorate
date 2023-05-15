@@ -24,21 +24,24 @@ public class FilmController {
 
     @PutMapping
     public Film put(@Valid @RequestBody Film film) {
+        log.debug("Получен запрос PUT film, film: {}", film);
         filmValidate(film);
         if (!films.containsKey(film.getId())) {
             throw new NullPointerException("Ошибка обновления фильма: id " + film.getId() + " нет в базе!");
         }
         films.put(film.getId(), film);
-        log.info("Обновление фильма");
+        log.debug("Получен ответ PUT film, film: {}", film);
         return film;
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
+        log.debug("Получен запрос POST film, film: {}", film);
         filmValidate(film);
         film.setId(id++);
+        log.debug("Присвоение film id: {}", film.getId());
         films.put(film.getId(), film);
-        log.info("Создание нового фильма");
+        log.debug("Получен ответ POST film, film: {}", film);
         return film;
     }
 
