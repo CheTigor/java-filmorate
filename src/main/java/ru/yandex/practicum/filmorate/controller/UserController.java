@@ -23,9 +23,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public User getUserById(
-            @PathVariable("id") @Min(1) int id
-    ) {
+    public User getUserById(@PathVariable("id") @Min(1) int id) {
         log.debug("Получен запрос (getUserById) GET id: {}", id);
         final User user = userService.getUserById(id);
         log.debug("Получен ответ (getUserById) GET user: {}", user);
@@ -57,10 +55,7 @@ public class UserController {
     }
 
     @PutMapping(value = "{id}/friends/{friendId}")
-    public User addFriend(
-            @PathVariable("id") @Min(1) int id,
-            @PathVariable("friendId") @Min(1) int friendId
-    ) {
+    public User addFriend(@PathVariable("id") @Min(1) int id, @PathVariable("friendId") @Min(1) int friendId) {
         log.debug("Получен запрос PUT, userId: {}, friendId: {}", id, friendId);
         User user = userService.addFriend(id, friendId);
         log.debug("Получен ответ PUT, user: {}", user);
@@ -68,10 +63,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "{id}/friends/{friendId}")
-    public User removeFriend(
-            @PathVariable("id") @Min(1) int id,
-            @PathVariable("friendId") @Min(1) int friendId
-    ) {
+    public User removeFriend(@PathVariable("id") @Min(1) int id, @PathVariable("friendId") @Min(1) int friendId) {
         log.debug("Получен запрос DELETE, userId: {}, friendId: {}", id, friendId);
         final User user = userService.removeFriend(id, friendId);
         log.debug("Получен ответ DELETE, user: {}", user);
@@ -79,9 +71,7 @@ public class UserController {
     }
 
     @GetMapping(value = "{id}/friends")
-    public List<User> getUserFriends(
-            @PathVariable("id") @Min(1) int id
-    ) {
+    public List<User> getUserFriends(@PathVariable("id") @Min(1) int id) {
         log.debug("Получен запрос GET, userId: {}", id);
         List<User> friends = userService.getUserFriends(id);
         log.debug("Получен ответ GET, friends: {}", friends);
@@ -89,10 +79,8 @@ public class UserController {
     }
 
     @GetMapping(value = "{id}/friends/common/{otherId}")
-    public List<User> getCommonFriends(
-            @PathVariable("id") @Min(1) int id,
-            @PathVariable("otherId") @Min(1) int otherId
-    ) {
+    public List<User> getCommonFriends(@PathVariable("id") @Min(1) int id,
+                                       @PathVariable("otherId") @Min(1) int otherId) {
         log.debug("Получен запрос GET, userId: {}, friendId: {}", id, otherId);
         List<User> commonFriends = userService.getCommonFriends(id, otherId);
         log.debug("Получен ответ GET, commonFriends: {}", commonFriends);

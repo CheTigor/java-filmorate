@@ -22,9 +22,7 @@ public class FilmController {
     }
 
     @GetMapping(value = "/{id}")
-    public Film getFilmById(
-            @PathVariable("id") @Min(1) int id
-    ) {
+    public Film getFilmById(@PathVariable("id") @Min(1) int id) {
         log.debug("Получен запрос (getFilmById) GET");
         final Film film = filmService.getFilmById(id);
         log.debug("Получен ответ (getFilmById) GET film: {}", film);
@@ -56,10 +54,7 @@ public class FilmController {
     }
 
     @PutMapping(value = "/{id}/like/{userId}")
-    public Film addLike(
-            @PathVariable("id") @Min(1) int id,
-            @PathVariable("userId") @Min(1) int userId
-    ) {
+    public Film addLike(@PathVariable("id") @Min(1) int id, @PathVariable("userId") @Min(1) int userId) {
         log.debug("Получен запрос PUT, filmId: {}, userId: {}", id, userId);
         final Film film = filmService.addLike(id, userId);
         log.debug("Получен ответ PUT, film: {}", film);
@@ -67,10 +62,7 @@ public class FilmController {
     }
 
     @DeleteMapping(value = "/{id}/like/{userId}")
-    public Film removeLike(
-            @PathVariable("id") @Min(1) int id,
-            @PathVariable("userId") @Min(1) int userId
-    ) {
+    public Film removeLike(@PathVariable("id") @Min(1) int id, @PathVariable("userId") @Min(1) int userId) {
         log.debug("Получен запрос DELETE, filmId: {}, userId: {}", id, userId);
         final Film film = filmService.deleteLike(id, userId);
         log.debug("Получен ответ DELETE, film: {}", film);
@@ -78,9 +70,7 @@ public class FilmController {
     }
 
     @GetMapping(value = "/popular")
-    public List<Film> getPopularFilms(
-            @RequestParam(defaultValue = "10", required = false) @Min(1) int count
-    ) {
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10", required = false) @Min(1) int count) {
         log.debug("Получен запрос (getPopularFilms) GET");
         List<Film> films = filmService.getPopularFilms(count);
         log.debug("Получен ответ (getPopularFilms) GET films: {}", films);

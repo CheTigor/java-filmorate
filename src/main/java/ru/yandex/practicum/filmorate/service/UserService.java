@@ -32,31 +32,19 @@ public class UserService {
     }
 
     public User put(@Valid User user) {
-        userStorage.put(user);
-        return user;
+        return userStorage.put(user);
     }
 
     public User create(@Valid User user) {
-        userStorage.create(user);
-        return user;
+        return userStorage.create(user);
     }
 
     public User addFriend(int id, int friendId) {
-        final User user = userStorage.getUserById(id);
-        final User friend = userStorage.getUserById(friendId);
-        user.getFriendsId().add(friendId);
-        friend.getFriendsId().add(id);
-        log.debug("Пользователи: {}, {} - стали друзьями", user, friend);
-        return user;
+        return userStorage.addFriend(id, friendId);
     }
 
     public User removeFriend(int id, int friendId) {
-        final User user = userStorage.getUserById(id);
-        final User friend = userStorage.getUserById(friendId);
-        user.getFriendsId().remove(friendId);
-        friend.getFriendsId().remove(id);
-        log.debug("Пользователи: {}, {} - перестали быть друзьями", user, friend);
-        return user;
+        return userStorage.removeFriend(id, friendId);
     }
 
     public List<User> getUserFriends(int id) {

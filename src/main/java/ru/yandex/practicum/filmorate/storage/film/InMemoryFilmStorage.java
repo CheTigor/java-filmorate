@@ -2,12 +2,11 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.Map;
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> films = new HashMap<>();
-    private int storageId = 1;
+    private int storageId = 0;
 
     @Override
     public List<Film> getAll() {
@@ -36,12 +35,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film put(Film film) {
-        filmValidate(film);
         if (film.getId() == 0) {
-            throw new ValidationException("Ошибка обновления фильма, не заполнено поле id");
+            throw new ValidationException("Ошибка обновления фильма - не заполнено поле id");
         }
         if (!films.containsKey(film.getId())) {
-            throw new FilmNotFoundException(String.format("Ошибка обновления фильма, id: %d не существует", film.getId()));
+            throw new FilmNotFoundException(String.format("Ошибка обновления фильма - id: %d не существует", film.getId()));
         }
         films.put(film.getId(), film);
         log.debug("В базе обновлен film: {}", film);
@@ -50,20 +48,42 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        filmValidate(film);
         if (film.getId() != 0) {
-            throw new ValidationException("Ошибка создания фильма, заполнено поле id");
+            throw new ValidationException("Ошибка создания фильма - заполнено поле id");
         }
         log.debug("Присвоение film id: {}", storageId);
-        film.setId(storageId++);
+        film.setId(++storageId);
         films.put(film.getId(), film);
         log.debug("В базу записан film: {}", film);
         return film;
     }
 
-    private void filmValidate(@Valid Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Ошибка валидации - Неверные входные данные у film: " + film);
+    @Override
+    public Film deleteFilmById(int filmId) {
+        final Film film = films.remove(filmId);
+        if (film == null) {
+            throw new ValidationException(String.format("Ошибка удаления фильма - фильм по id: %d не найден", filmId));
         }
+        return film;
+    }
+
+    @Override
+    public Film addLike(int filmId, int userId) {
+        final Film film = getFilmById(filmId);
+        if (film.getUserLikes().contains(userId)) {
+            throw new AlreadyExistException(String.format(
+                    "Пользователь c id: %d уже поставил лайк фильму c id: %d", userId, filmId));
+        }
+        film.getUserLikes().add(userId);
+        log.debug("Фильму с id: {}, поставлен лайк от пользователя с id: {}", filmId, userId);
+        return film;
+    }
+
+    @Override
+    public Film deleteLike(int filmId, int userId) {
+        final Film film = getFilmById(filmId);
+        film.getUserLikes().remove(userId);
+        log.debug("Фильму с id: {}, убрали лайк от пользователя с id: {}", filmId, userId);
+        return film;
     }
 }

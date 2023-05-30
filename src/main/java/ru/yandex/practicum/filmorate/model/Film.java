@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -21,6 +22,7 @@ public class Film {
     @NotNull
     @Positive
     private final long duration;
+    @JsonIgnore
     private final Set<Integer> userLikes = new HashSet<>();
 
 }

@@ -3,11 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
-import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,10 +17,12 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     public Film getFilmById(int id) {
@@ -31,33 +34,25 @@ public class FilmService {
     }
 
     public Film put(Film film) {
+        filmValidate(film);
         return filmStorage.put(film);
     }
 
     public Film create(Film film) {
+        filmValidate(film);
         return filmStorage.create(film);
     }
 
     public Film addLike(int filmId, int userId) {
-        final Film film = filmStorage.getFilmById(filmId);
-        if (film.getUserLikes().contains(userId)) {
-            throw new AlreadyExistException(String.format(
-                    "Пользователь c id: %d уже поставил лайк фильму c id: %d", userId, filmId));
-        }
-        film.getUserLikes().add(userId);
-        log.debug("Фильму с id: {}, поставлен лайк от пользователя с id: {}", filmId, userId);
-        return film;
+        //Проверка на null
+        userStorage.getUserById(userId);
+        return filmStorage.addLike(filmId, userId);
     }
 
     public Film deleteLike(int filmId, int userId) {
-        final Film film = filmStorage.getFilmById(filmId);
-        if (!film.getUserLikes().contains(userId)) {
-            throw new LikeNotFoundException(String.format(
-                    "Пользователь с id: %d не ставил лайк фильму с id: %d", userId, filmId));
-        }
-        film.getUserLikes().remove(userId);
-        log.debug("Фильму с id: {}, убрали лайк от пользователя с id: {}", filmId, userId);
-        return film;
+        //Проверка на null
+        userStorage.getUserById(userId);
+        return filmStorage.deleteLike(filmId, userId);
     }
 
     public List<Film> getPopularFilms(int count) {
@@ -68,6 +63,12 @@ public class FilmService {
                 .sorted((fl1, fl2) -> fl2.getUserLikes().size() - fl1.getUserLikes().size())
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    private void filmValidate(Film film) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            throw new ValidationException("Ошибка валидации - Неверные входные данные у film: " + film);
+        }
     }
 }
 

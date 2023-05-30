@@ -16,7 +16,7 @@ import java.util.Map;
 public class InMemoryUserStorage implements UserStorage {
 
     private final Map<Integer, User> users = new HashMap<>();
-    private int storageId = 1;
+    private int storageId = 0;
 
     @Override
     public List<User> getAll() {
@@ -55,10 +55,39 @@ public class InMemoryUserStorage implements UserStorage {
             user.setName(user.getLogin());
             log.debug("name присваивает значение login, name = {}", user.getName());
         }
-        user.setId(storageId++);
+        user.setId(++storageId);
         log.debug("Присвоение user id: {}", user.getId());
         users.put(user.getId(), user);
         log.debug("В базу данных сохранен user: {}", user);
+        return user;
+    }
+
+    @Override
+    public User addFriend(int id, int friendId) {
+        final User user = getUserById(id);
+        final User friend = getUserById(friendId);
+        user.getFriendsId().add(friendId);
+        friend.getFriendsId().add(id);
+        log.debug("Пользователи: {}, {} - стали друзьями", user, friend);
+        return user;
+    }
+
+    @Override
+    public User removeFriend(int id, int friendId) {
+        final User user = getUserById(id);
+        final User friend = getUserById(friendId);
+        user.getFriendsId().remove(friendId);
+        friend.getFriendsId().remove(id);
+        log.debug("Пользователи: {}, {} - перестали быть друзьями", user, friend);
+        return user;
+    }
+
+    @Override
+    public User deleteUserById(int userId) {
+        final User user = users.remove(userId);
+        if (user == null) {
+            throw new ValidationException(String.format("Ошибка удаления фильма - фильм по id: %d не найден", userId));
+        }
         return user;
     }
 }
