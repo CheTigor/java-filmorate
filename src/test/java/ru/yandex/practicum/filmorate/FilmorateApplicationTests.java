@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.model.*;
 
@@ -54,6 +55,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	@Sql(scripts = {"/schema.sql", "/data.sql"})
 	void testDB() {
 		//testCreate
 		Film film = filmDao.create(spiderMan);
@@ -143,6 +145,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	@Sql(scripts = {"/schema.sql", "/data.sql"})
 	void testGenre() {
 		//(1, 'Комедия'), (2, 'Драма'), (3, 'Мультфильм'), (4, 'Триллер'), (5, 'Документальный'), (6, 'Боевик');
 		genreDao.deleteById(1);
@@ -158,6 +161,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	@Sql(scripts = {"/schema.sql", "/data.sql"})
 	void testRating() {
 		//(1, 'G'), (2, 'PG'), (3, 'PG-13'), (4, 'R'), (5, 'NC-17');
 		ratingDao.deleteById(1);
@@ -172,6 +176,7 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	@Sql(scripts = {"/schema.sql", "/data.sql"})
 	void testFSStatus() {
 		//(1, 'подтвержденный'), (2, 'неподтвержденный');
 		fsStatusDao.deleteById(1);
