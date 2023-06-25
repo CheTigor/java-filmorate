@@ -31,7 +31,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> getAll() {
-        String sqlQuery = "select * from \"users\"";
+        String sqlQuery = "SELECT * FROM users";
         List<User> users = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeUser(rs));
         if (users.isEmpty()) {
             log.info("Таблица films пуста");
@@ -43,7 +43,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User getUserById(int id) {
-        String sqlQuery = "select * from \"users\" where \"id\" = ?";
+        String sqlQuery = "SELECT * FROM users WHERE id = ?";
         User user = jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) -> makeUser(rs), id);
         if (user != null) {
             log.info("Найден пользователь с id: {}", user.getId());
@@ -63,14 +63,14 @@ public class UserDaoImpl implements UserDao {
             user.setName(user.getLogin());
             log.debug("name присваивает значение login, name = {}", user.getName());
         }
-        String sqlQuery = "update \"users\" set \"name\" = ?, \"email\" = ?, " +
-                "\"login\" = ?, \"birthday\" = ? where \"id\" = ?";
+        String sqlQuery = "UPDATE users SET name = ?, email = ?, " +
+                "login = ?, birthday = ? WHERE id = ?";
         int count = jdbcTemplate.update(sqlQuery, user.getName(), user.getEmail(),
                 user.getLogin(), user.getBirthday(), user.getId());
         if (count == 0) {
             throw new UserNotFoundException("Ошибка обновления пользователя: id " + user.getId() + " нет в базе!");
         } else {
-            String sqlQuery2 = "select * from \"users\" where \"id\" = ?";
+            String sqlQuery2 = "SELECT * FROM users WHERE id = ?";
             User userDB = jdbcTemplate.queryForObject(sqlQuery2, (rs, rowNum) -> makeUser(rs), user.getId());
             log.debug("В базе создан user: {}", userDB);
             return userDB;
@@ -88,8 +88,8 @@ public class UserDaoImpl implements UserDao {
             log.debug("name присваивает значение login, name = {}", user.getName());
         }
         //создание и получение id
-        String sqlQuery = "insert into \"users\"(\"name\", \"email\", \"login\", \"birthday\")" +
-                " values (?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO users(name, email, login, birthday)" +
+                " VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         int count = jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
@@ -104,7 +104,7 @@ public class UserDaoImpl implements UserDao {
         if (count == 0) {
             throw new UserNotFoundException("Ошибка создания пользователя: name " + user.getName());
         } else {
-            String sqlQuery2 = "select * from \"users\" where \"id\" = ?";
+            String sqlQuery2 = "SELECT * FROM users WHERE id = ?";
             User userDB = jdbcTemplate.queryForObject(sqlQuery2, (rs, rowNum) -> makeUser(rs), id);
             log.debug("В базе создан user: {}", userDB);
             return userDB;
@@ -112,57 +112,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User deleteUserById(int userId) {
-        final User user = getUserById(userId);
-        jdbcTemplate.update("delete from \"users\" " +
-                "where \"id\" = ?", userId);
-        return user;
-    }
-
-    @Override
-    //statusId: 1 - подтвержденная, 2 - неподтвержденная
-    public User addFriend(int id, int friendId) {
-        final User user = getUserById(id);
-        final User friend = getUserById(friendId);
-        List<Integer> friendsIds = getUserFriendsIds(id);
-        if (friendsIds.contains(friendId)) {
-            log.debug("user id = {} уже является другом user id = {}", id, friendId);
-            return user;
-        }
-        int statusId = 2;
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from \"friendship\" " +
-                "where \"user_id_2\" = ? and \"user_id_1\" = ?", id, friendId);
-        if (userRows.next()) {
-            statusId = 1;
-            String sqlQuery = "update \"friendship\" set \"status\" = ? where \"user_id_2\" = ? and \"user_id_1\" = ?";
-            jdbcTemplate.update(sqlQuery, statusId, id, friendId);
-            log.debug("user_id_2 = {} и user_id_1 = {} поменялся статус дружбы на подтвержденный", id, friendId);
-        }
-        String sqlQuery = "insert into \"friendship\" (\"user_id_1\", \"user_id_2\", \"status_id\") values (?, ?, ?)";
-        jdbcTemplate.update(sqlQuery, id, friendId, statusId);
-        log.debug("user_id_1 = {} отправил запрос на дружбу user_id_2 = {}", id, friendId);
-        return user;
-    }
-
-    @Override
-    public User removeFriend(int id, int friendId) {
-        final User user = getUserById(id);
-        final User friend = getUserById(friendId);
-        int statusId = 2;
-        jdbcTemplate.update("delete from \"friendship\" " +
-                "where \"user_id_1\" = ? and \"user_id_2\" = ?", id, friendId);
-        log.debug("user_id_1 = {} удалил из друзей user_id_2 = {}", id, friendId);
-        jdbcTemplate.update("update \"friendship\" set \"status_id\" = ? " +
-                "where \"user_id_2\" = ? and \"user_id_1\" = ?", statusId, id, friendId);
-        log.debug("user_id_2 = {} и user_id_1 = {} поменялся статус дружбы на неподтвержденный", id, friendId);
-        return user;
+    public void deleteUserById(int userId) {
+        jdbcTemplate.update("DELETE FROM users WHERE id = ?", userId);
     }
 
     public List<Integer> getUserFriendsIds(int id) {
-        getUserById(id);
         List<Integer> userIds = new ArrayList<>();
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(
-                "select \"user_id_2\" from \"friendship\" where \"user_id_1\" = ?", id);
+                "SELECT user_id_2 FROM friendship WHERE user_id_1 = ?", id);
         while (userRows.next()) {
             userIds.add(userRows.getInt("user_id_2"));
         }

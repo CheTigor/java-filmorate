@@ -31,10 +31,10 @@ public class Film {
     @Positive
     private long duration;
     private int rate;
-    private Rating mpa;
+    private Mpa mpa;
     private List<Genre> genres = new ArrayList<>();
 
-    public Film(int id, String name, String description, LocalDate releaseDate, long duration, Rating mpa) {
+    public Film(int id, String name, String description, LocalDate releaseDate, long duration, Mpa mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -43,7 +43,7 @@ public class Film {
         this.mpa = mpa;
     }
 
-    public Film(String name, String description, LocalDate releaseDate, long duration, Rating mpa) {
+    public Film(String name, String description, LocalDate releaseDate, long duration, Mpa mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
@@ -52,5 +52,13 @@ public class Film {
     }
 
     public Film() {
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
+
+    public void removeGenre(Genre genre) {
+        genres.remove(genre);
     }
 }

@@ -14,11 +14,7 @@ public interface UserDao {
 
     User create(User user);
 
-    User deleteUserById(int userId);
+    void deleteUserById(int userId);
 
     List<Integer> getUserFriendsIds(int id);
-
-    User addFriend(int id, int friendId);
-
-    User removeFriend(int id, int friendId);
 }

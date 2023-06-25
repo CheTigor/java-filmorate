@@ -19,23 +19,11 @@ public class GenreService {
         this.genreDao = genreDao;
     }
 
-    public Genre create(Genre genre) {
-        return genreDao.create(genre);
-    }
-
     public List<Genre> getAll() {
         return genreDao.getAll();
     }
 
     public Genre getById(int genreId) {
         return genreDao.getById(genreId);
-    }
-
-    public Genre put(Genre genre) {
-        return genreDao.put(genre);
-    }
-
-    public Genre deleteById(int genreId) {
-        return genreDao.deleteById(genreId);
     }
 }

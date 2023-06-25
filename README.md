@@ -36,7 +36,7 @@ WHERE g.name = 'Триллер';
 
 SELECT f.name
 FROM film as f
-JOIN rating AS r ON f.rating_id = r.id
+JOIN mpa AS r ON f.rating_id = r.id
 WHERE r.name = 'PG-13';
 
 4. Получение подтвержденных друзей user_id = 1

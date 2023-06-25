@@ -19,23 +19,11 @@ public class FSStatusService {
         this.fsStatusDao = fsStatusDao;
     }
 
-    public FsStatus create(FsStatus fSStatus) {
-        return fsStatusDao.create(fSStatus);
-    }
-
     public List<FsStatus> getAll() {
         return fsStatusDao.getAll();
     }
 
     public FsStatus getById(int fSStatusId) {
         return fsStatusDao.getById(fSStatusId);
-    }
-
-    public FsStatus put(FsStatus fSStatus) {
-        return fsStatusDao.put(fSStatus);
-    }
-
-    public FsStatus deleteById(int fSStatusId) {
-        return fsStatusDao.deleteById(fSStatusId);
     }
 }
